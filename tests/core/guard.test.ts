@@ -3,7 +3,7 @@ import { createGuard } from "../../src/core/guard";
 import { RateLimitError, BudgetExceededError, ConfigError } from "../../src/errors";
 import { memoryStorage } from "../../src/storage/memory";
 
-const pricing = { openai: { "gpt-4o": { inputPer1k: 0.01, outputPer1k: 0.03 } } };
+const pricing = { "your-provider": { "your-model": { inputPer1k: 0.01, outputPer1k: 0.03 } } };
 
 const fakeClockGuard = (overrides = {}) => {
   let now = Date.UTC(2026, 5, 22, 10, 0, 0);
@@ -35,8 +35,8 @@ describe("guard.run", () => {
   it("returns data and computed usage from response usage", async () => {
     const { guard } = fakeClockGuard();
     const { data, usage } = await guard.run({
-      provider: "openai",
-      model: "gpt-4o",
+      provider: "your-provider",
+      model: "your-model",
       execute: async () => ({ ok: true, usage: { prompt_tokens: 1000, completion_tokens: 1000 } }),
     });
     expect(data).toEqual({ ok: true, usage: { prompt_tokens: 1000, completion_tokens: 1000 } });
@@ -50,8 +50,8 @@ describe("guard.run", () => {
     const { guard } = fakeClockGuard({ limits: { requestsPerMinute: 1 } });
     const call = () =>
       guard.run({
-        provider: "openai",
-        model: "gpt-4o",
+        provider: "your-provider",
+        model: "your-model",
         execute: async () => ({ usage: { prompt_tokens: 1, completion_tokens: 1 } }),
       });
     await call();
@@ -63,8 +63,8 @@ describe("guard.run", () => {
     const execute = vi.fn(async () => ({ usage: { prompt_tokens: 1, completion_tokens: 1 } }));
     await expect(
       guard.run({
-        provider: "openai",
-        model: "gpt-4o",
+        provider: "your-provider",
+        model: "your-model",
         estimate: { inputTokens: 1000, outputTokens: 1000 }, // est cost 0.04 > 0.01
         execute,
       }),
@@ -79,8 +79,8 @@ describe("guard.run", () => {
       hooks: { onBudgetWarning },
     });
     await guard.run({
-      provider: "openai",
-      model: "gpt-4o",
+      provider: "your-provider",
+      model: "your-model",
       execute: async () => ({ usage: { prompt_tokens: 1000, completion_tokens: 1000 } }), // cost 0.04
     });
     expect(onBudgetWarning).toHaveBeenCalledTimes(1);
@@ -90,8 +90,8 @@ describe("guard.run", () => {
   it("getUsage reports today/month cost, requests, and remaining budget", async () => {
     const { guard } = fakeClockGuard({ budget: { monthlyUSD: 1 } });
     await guard.run({
-      provider: "openai",
-      model: "gpt-4o",
+      provider: "your-provider",
+      model: "your-model",
       key: "u1",
       execute: async () => ({ usage: { prompt_tokens: 1000, completion_tokens: 1000 } }),
     });
@@ -104,8 +104,8 @@ describe("guard.run", () => {
   it("reset clears tracked usage for a key", async () => {
     const { guard } = fakeClockGuard();
     await guard.run({
-      provider: "openai",
-      model: "gpt-4o",
+      provider: "your-provider",
+      model: "your-model",
       key: "u1",
       execute: async () => ({ usage: { prompt_tokens: 10, completion_tokens: 10 } }),
     });
@@ -118,7 +118,7 @@ describe("guard.run", () => {
   it("marks usage estimated when pricing is unknown", async () => {
     const { guard } = fakeClockGuard();
     const { usage } = await guard.run({
-      provider: "openai",
+      provider: "your-provider",
       model: "no-such-model",
       execute: async () => ({ usage: { prompt_tokens: 10, completion_tokens: 10 } }),
     });
@@ -134,8 +134,8 @@ describe("guard.run", () => {
       hooks: { onBudgetExceeded },
     });
     const { usage } = await guard.run({
-      provider: "openai",
-      model: "gpt-4o",
+      provider: "your-provider",
+      model: "your-model",
       estimate: { inputTokens: 1000, outputTokens: 1000 },
       execute: async () => ({ usage: { prompt_tokens: 1000, completion_tokens: 1000 } }),
     });

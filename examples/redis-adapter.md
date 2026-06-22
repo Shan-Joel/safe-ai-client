@@ -1,7 +1,7 @@
 # Redis storage adapter
 
 `safe-ai-client` ships a memory adapter and a small `Storage` interface so you can
-plug in Redis/Upstash for distributed limits. Implement these four methods:
+plug in Redis (or any key/value store) for distributed limits. Implement these four methods:
 
 ```ts
 import type { Storage } from "safe-ai-client";

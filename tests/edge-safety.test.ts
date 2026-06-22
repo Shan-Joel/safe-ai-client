@@ -26,8 +26,8 @@ describe("edge-runtime safety", () => {
     const { createGuard } = await import("../src/index");
     const guard = createGuard();
     const { usage } = await guard.run({
-      provider: "openai",
-      model: "gpt-4o",
+      provider: "your-provider",
+      model: "your-model",
       execute: async () => ({ usage: { prompt_tokens: 1, completion_tokens: 1 } }),
     });
     expect(usage.requestId).toBeTypeOf("string");

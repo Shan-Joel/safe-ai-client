@@ -23,11 +23,11 @@ describe("cost-engine", () => {
   });
 
   it("looks up pricing by provider and model", () => {
-    expect(lookupPricing(builtInPricing, "openai", "gpt-4o-mini")).toEqual({
-      inputPer1k: 0.00015,
-      outputPer1k: 0.0006,
+    expect(lookupPricing(builtInPricing, "your-provider", "your-model")).toEqual({
+      inputPer1k: 0.001,
+      outputPer1k: 0.002,
     });
-    expect(lookupPricing(builtInPricing, "openai", "unknown-model")).toBeUndefined();
+    expect(lookupPricing(builtInPricing, "your-provider", "unknown-model")).toBeUndefined();
     expect(lookupPricing(builtInPricing, "unknown", "x")).toBeUndefined();
   });
 

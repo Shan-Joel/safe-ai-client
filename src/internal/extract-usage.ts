@@ -1,6 +1,12 @@
 import type { TokenUsage } from "../types";
 
-/** Best-effort extraction of token usage from a provider response body (OpenAI/Anthropic). */
+/**
+ * Best-effort extraction of token usage from a response body. Recognizes the two most
+ * common `usage` field shapes returned by AI APIs:
+ *   - `{ prompt_tokens, completion_tokens }`
+ *   - `{ input_tokens, output_tokens }`
+ * If neither is present, returns null so the caller can fall back to an estimate.
+ */
 export function defaultExtractUsage(data: unknown): TokenUsage | null {
   if (!data || typeof data !== "object") return null;
   const usage = (data as { usage?: unknown }).usage;

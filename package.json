@@ -1,6 +1,6 @@
 {
   "name": "safe-ai-client",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Provider-agnostic AI usage safety layer: rate limiting, real-time cost tracking, and budget enforcement to prevent surprise API bills. Zero dependencies, edge-ready, TypeScript-first.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -32,11 +32,11 @@
   },
   "keywords": [
     "ai",
-    "openai",
-    "anthropic",
+    "ai-api",
     "rate-limit",
     "rate-limiter",
     "cost",
+    "cost-tracking",
     "budget",
     "quota",
     "usage",

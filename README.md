@@ -48,20 +48,26 @@ const guard = createGuard({
   limits: { requestsPerMinute: 60, requestsPerDay: 10_000 },
   budget: { dailyUSD: 5, monthlyUSD: 100, warnAt: [0.8, 0.9] },
   enforcement: "block",
+  // Set your model's per-1k token rates so cost can be tracked.
+  pricing: {
+    "your-provider": {
+      "your-model": { inputPer1k: 0.001, outputPer1k: 0.002 },
+    },
+  },
 });
 
 const { data, usage } = await guard.run({
-  provider: "openai",
-  model: "gpt-4o",
+  provider: "your-provider", // a label you choose for your AI provider
+  model: "your-model", //       a label you choose for the model
   execute: async () => {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    const res = await fetch("https://api.your-ai-provider.example/v1/chat/completions", {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${process.env.AI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "your-model",
         messages: [{ role: "user", content: "Hello!" }],
       }),
     });
@@ -71,6 +77,10 @@ const { data, usage } = await guard.run({
 
 console.log("This call cost ~$", usage.costUSD);
 ```
+
+> `"your-provider"` and `"your-model"` are just **labels you choose** — swap in
+> whatever names you like (they only need to match between `pricing` and `run`).
+> Replace the URL and API key with your real provider's.
 
 `guard.run()` automatically:
 
@@ -87,25 +97,26 @@ stores, or logs credentials.
 ## 🔑 Provider-agnostic by design
 
 `guard.run()` wraps **any** async call — `fetch`, an official SDK, your own
-gateway. You supply `execute()`; the guard handles safety.
+gateway. You supply `execute()`; the guard handles safety. It works with any AI
+provider because *you* control the request.
 
 ```ts
 const { data, usage } = await guard.run({
-  provider: "anthropic",
-  model: "claude-sonnet-4",
-  execute: () => anthropic.messages.create({ /* ... */ }), // any promise
+  provider: "your-provider",
+  model: "your-model",
+  execute: () => yourClient.createCompletion({ /* ... */ }), // any promise
 });
 ```
 
-Token usage is read automatically from OpenAI (`prompt_tokens` /
-`completion_tokens`) and Anthropic (`input_tokens` / `output_tokens`) response
-shapes. For anything else, supply `extractUsage`:
+Token usage is read automatically when the response includes a `usage` object in
+either common shape — `{ prompt_tokens, completion_tokens }` or
+`{ input_tokens, output_tokens }`. For any other shape, supply `extractUsage`:
 
 ```ts
 await guard.run({
-  provider: "custom",
-  model: "my-model",
-  execute: () => callMyModel(),
+  provider: "your-provider",
+  model: "your-model",
+  execute: () => callYourModel(),
   extractUsage: (result) => ({ inputTokens: result.in, outputTokens: result.out }),
 });
 ```
@@ -116,13 +127,13 @@ await guard.run({
 
 ```ts
 const { data, usage } = await guard.guardedFetch(
-  "openai",
-  "gpt-4o",
-  "https://api.openai.com/v1/chat/completions",
+  "your-provider",
+  "your-model",
+  "https://api.your-ai-provider.example/v1/chat/completions",
   {
     method: "POST",
-    headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-    body: JSON.stringify({ model: "gpt-4o", messages: [{ role: "user", content: "Hi" }] }),
+    headers: { Authorization: `Bearer ${process.env.AI_API_KEY}` },
+    body: JSON.stringify({ model: "your-model", messages: [{ role: "user", content: "Hi" }] }),
   },
 );
 
@@ -164,10 +175,10 @@ Pre-flight blocking requires you to pass an `estimate`:
 
 ```ts
 await guard.run({
-  provider: "openai",
-  model: "gpt-4o",
+  provider: "your-provider",
+  model: "your-model",
   estimate: { inputTokens: 1200, outputTokens: 800 }, // checked before the call
-  execute: () => callOpenAI(),
+  execute: () => callYourModel(),
 });
 // → throws BudgetExceededError if this would push you over the cap (in "block" mode)
 ```
@@ -204,10 +215,10 @@ Pass a `key` to give each user, tenant, or API key its own rate-limit and budget
 
 ```ts
 await guard.run({
-  provider: "openai",
-  model: "gpt-4o-mini",
+  provider: "your-provider",
+  model: "your-model",
   key: userId, // independent limits + budget per user
-  execute: () => callOpenAI(prompt),
+  execute: () => callYourModel(prompt),
 });
 
 await guard.getUsage(userId); // that user's usage only
@@ -216,25 +227,30 @@ await guard.reset(userId);    // clear a user's current-period counters
 
 ---
 
-## 💰 Custom pricing
+## 💰 Pricing (you set the rates)
 
-Pricing is a **dated, overridable estimate snapshot**. Override or extend it for
-your negotiated rates or self-hosted models:
+To track cost, give each provider/model its **per-1k token rates**. No real provider
+prices ship with the package — you supply your own, so the numbers are always accurate
+and never go stale. Provider and model names are just labels you choose.
 
 ```ts
-import { createGuard, builtInPricing } from "safe-ai-client";
+import { createGuard } from "safe-ai-client";
 
 const guard = createGuard({
   pricing: {
-    ...builtInPricing,
-    openai: {
-      ...builtInPricing.openai,
-      "gpt-4o": { inputPer1k: 0.0025, outputPer1k: 0.01 },
+    "your-provider": {
+      "your-model": { inputPer1k: 0.001, outputPer1k: 0.002 },
+      "your-cheaper-model": { inputPer1k: 0.0002, outputPer1k: 0.0006 },
     },
-    "my-self-hosted": { "llama-3.1-70b": { inputPer1k: 0, outputPer1k: 0 } },
+    "self-hosted": {
+      "internal-model": { inputPer1k: 0, outputPer1k: 0 }, // free / internal
+    },
   },
 });
 ```
+
+If a request's provider/model has no configured price, its cost is recorded as `0`
+and the usage record is flagged `estimated: true`.
 
 ---
 
@@ -242,7 +258,7 @@ const guard = createGuard({
 
 The built-in `memoryStorage()` is perfect for single-instance apps and the edge.
 For distributed limits across instances, implement the small `Storage` interface
-(four methods) backed by Redis / Upstash / any KV — see
+(four methods) backed by Redis or any key/value store — see
 [`examples/redis-adapter.md`](examples/redis-adapter.md).
 
 ```ts
@@ -256,7 +272,7 @@ const guard = createGuard({ storage: myRedisStorage });
 ## 🏗️ Runs everywhere
 
 - **Node.js 18+**
-- **Vercel Edge** / **Cloudflare Workers** (zero Node built-ins in the core)
+- **Edge and serverless runtimes** (zero Node built-ins in the core)
 - Any bundler (ESM or CJS)
 
 The core has **no runtime dependencies** and uses only `globalThis.crypto` and the
@@ -264,16 +280,16 @@ The core has **no runtime dependencies** and uses only `globalThis.crypto` and t
 
 ---
 
-## ⚠️ Limitations (v0.1.0)
+## ⚠️ Limitations
 
 Read these before relying on it in production — they're scope boundaries of the
-first release, not bugs, and each is addressed by a roadmap item:
+early releases, not bugs, and each is addressed by a roadmap item:
 
 - **The built-in `memoryStorage()` is per-process.** On serverless / edge platforms
-  (Vercel, Cloudflare Workers, AWS Lambda) every instance keeps its own counters, so
-  rate limits and budgets are enforced **per instance, not globally**. For shared
-  enforcement across instances, provide a distributed `Storage` adapter (e.g. Redis —
-  see [`examples/redis-adapter.md`](examples/redis-adapter.md)). Memory state is also
+  every instance keeps its own counters, so rate limits and budgets are enforced
+  **per instance, not globally**. For shared enforcement across instances, provide a
+  distributed `Storage` adapter (e.g. Redis — see
+  [`examples/redis-adapter.md`](examples/redis-adapter.md)). Memory state is also
   reset on process restart.
 - **Rate limiting is approximate under high concurrency.** A limit is checked and then
   consumed across `await` points, so many simultaneous in-flight requests in the same
@@ -283,27 +299,26 @@ first release, not bugs, and each is addressed by a roadmap item:
 - **Streaming responses aren't auto-metered.** Token usage is parsed from non-streaming
   JSON bodies. For streamed responses, pass an `estimate` (and/or `extractUsage`) so
   budgets and cost tracking still apply.
-- **Cost is estimated** from a dated, overridable pricing snapshot — see the disclaimer
-  below.
+- **Cost is calculated from the rates you configure.** No provider prices ship with
+  the package — see the disclaimer below.
 
 ---
 
-## ⚠️ Pricing disclaimer
+## ⚠️ Cost disclaimer
 
-Cost figures are **estimates** based on a static, overridable pricing snapshot
-(`PRICING_SNAPSHOT_DATE`). They are provided for convenience only and may differ
-from your provider's actual billing. Always rely on your provider's official
-invoices for billing decisions.
+Cost figures are **estimates** computed from the per-1k rates **you** configure in
+`pricing`. They may differ from your provider's actual billing (rounding, special
+token types, tiered pricing, etc.). Always rely on your provider's official invoices
+for billing decisions.
 
 ---
 
 ## 📛 Trademarks & affiliation
 
 `safe-ai-client` is an independent, unofficial project and is **not affiliated with,
-endorsed by, or sponsored by** OpenAI, Anthropic, or any other provider. Provider and
-model names are used only to describe interoperability. All product names, logos, and
-trademarks are the property of their respective owners. Pricing data is an unofficial
-estimate and may be inaccurate — see the disclaimer above.
+endorsed by, or sponsored by** any AI provider, platform, or other company. It calls
+no provider directly — you supply your own request and credentials. All product names
+and trademarks are the property of their respective owners.
 
 ---
 
@@ -318,11 +333,11 @@ report a vulnerability.
 
 ## 🛣️ Roadmap
 
-- [ ] Express / Next.js middleware adapters
-- [ ] First-class Redis / Upstash storage adapter
-- [ ] Optional provider-SDK auto-wrapping (`openai.chat.completions.create`)
+- [ ] Web framework middleware adapters
+- [ ] First-class Redis / KV storage adapter
+- [ ] Optional official SDK auto-wrapping
 - [ ] Cheaper-model suggestions
-- [ ] Webhook alerts (Slack / Discord) and a usage dashboard
+- [ ] Webhook alerts and a usage dashboard
 
 ---
 

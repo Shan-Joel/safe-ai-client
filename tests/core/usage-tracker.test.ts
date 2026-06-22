@@ -4,8 +4,8 @@ import { createUsageTracker } from "../../src/core/usage-tracker";
 import type { UsageRecord } from "../../src/types";
 
 const rec = (over: Partial<UsageRecord>): UsageRecord => ({
-  provider: "openai",
-  model: "gpt-4o",
+  provider: "your-provider",
+  model: "your-model",
   key: "u1",
   inputTokens: 100,
   outputTokens: 50,

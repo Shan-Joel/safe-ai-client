@@ -1,15 +1,15 @@
-import { createGuard, builtInPricing } from "safe-ai-client";
+import { createGuard } from "safe-ai-client";
 
-// Override or extend the built-in (estimated) pricing snapshot.
+// Set per-1k token rates for each provider/model you use. The provider and model
+// strings are just labels you choose — they must match what you pass to `guard.run`.
 const guard = createGuard({
   pricing: {
-    ...builtInPricing,
-    openai: {
-      ...builtInPricing.openai,
-      "gpt-4o": { inputPer1k: 0.0025, outputPer1k: 0.01 }, // your negotiated rates
+    "your-provider": {
+      "your-model": { inputPer1k: 0.001, outputPer1k: 0.002 }, // your negotiated rates
+      "your-cheaper-model": { inputPer1k: 0.0002, outputPer1k: 0.0006 },
     },
-    "my-self-hosted": {
-      "llama-3.1-70b": { inputPer1k: 0, outputPer1k: 0 }, // free / internal
+    "self-hosted": {
+      "internal-model": { inputPer1k: 0, outputPer1k: 0 }, // free / internal
     },
   },
 });

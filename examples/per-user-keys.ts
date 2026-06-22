@@ -8,14 +8,15 @@ const guard = createGuard({
 
 async function handleUserRequest(userId: string, prompt: string) {
   return guard.run({
-    provider: "openai",
-    model: "gpt-4o-mini",
+    provider: "your-provider",
+    model: "your-model",
     key: userId, // each user gets their own rate-limit + budget bucket
-    execute: () => callOpenAI(prompt),
+    execute: () => callYourModel(prompt),
   });
 }
 
-declare function callOpenAI(
+// Stand-in for your real AI call (any function returning a promise).
+declare function callYourModel(
   prompt: string,
 ): Promise<{ usage: { prompt_tokens: number; completion_tokens: number } }>;
 void handleUserRequest;
