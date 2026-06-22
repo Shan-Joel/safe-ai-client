@@ -3,6 +3,16 @@
 All notable changes to this project are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-06-22
+
+### Documentation
+
+- Add a Trademarks & Affiliation disclaimer (independent/unofficial project; provider
+  names used only for interoperability).
+- Document v0.1.0 limitations (per-process memory storage, approximate concurrency,
+  streaming requires an estimate, estimated pricing).
+- Set repository/author metadata.
+
 ## [0.1.0] - 2026-06-22
 
 ### Added

@@ -297,6 +297,16 @@ invoices for billing decisions.
 
 ---
 
+## 📛 Trademarks & affiliation
+
+`safe-ai-client` is an independent, unofficial project and is **not affiliated with,
+endorsed by, or sponsored by** OpenAI, Anthropic, or any other provider. Provider and
+model names are used only to describe interoperability. All product names, logos, and
+trademarks are the property of their respective owners. Pricing data is an unofficial
+estimate and may be inaccurate — see the disclaimer above.
+
+---
+
 ## 🔒 Security & privacy
 
 `safe-ai-client` never sees, stores, or transmits your API keys — you own the
