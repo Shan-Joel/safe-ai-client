@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+.env
+.env.*
+
+# Local scratch playground (see `npm run demo`)
+demo.mjs

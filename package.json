@@ -1,0 +1,68 @@
+{
+  "name": "safe-ai-client",
+  "version": "0.1.0",
+  "description": "Provider-agnostic AI usage safety layer: rate limiting, real-time cost tracking, and budget enforcement to prevent surprise API bills. Zero dependencies, edge-ready, TypeScript-first.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "README.md", "LICENSE", "SECURITY.md", "CHANGELOG.md"],
+  "sideEffects": false,
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "demo": "tsup && node demo.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "openai",
+    "anthropic",
+    "rate-limit",
+    "rate-limiter",
+    "cost",
+    "budget",
+    "quota",
+    "usage",
+    "llm",
+    "guard",
+    "safety",
+    "spend",
+    "token",
+    "edge",
+    "serverless"
+  ],
+  "author": "safe-ai-client contributors",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/OWNER/safe-ai-client.git" },
+  "bugs": { "url": "https://github.com/OWNER/safe-ai-client/issues" },
+  "homepage": "https://github.com/OWNER/safe-ai-client#readme",
+  "publishConfig": { "access": "public", "provenance": true },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/node": "^20.16.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.10.0",
+    "vitest": "^2.1.0"
+  }
+}
