@@ -48,11 +48,11 @@
     "edge",
     "serverless"
   ],
-  "author": "safe-ai-client contributors",
+  "author": "Shan-Joel <shan.joeld@gmail.com>",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/OWNER/safe-ai-client.git" },
-  "bugs": { "url": "https://github.com/OWNER/safe-ai-client/issues" },
-  "homepage": "https://github.com/OWNER/safe-ai-client#readme",
+  "repository": { "type": "git", "url": "git+https://github.com/Shan-Joel/safe-ai-client.git" },
+  "bugs": { "url": "https://github.com/Shan-Joel/safe-ai-client/issues" },
+  "homepage": "https://github.com/Shan-Joel/safe-ai-client#readme",
   "publishConfig": { "access": "public", "provenance": true },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

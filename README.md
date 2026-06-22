@@ -264,6 +264,30 @@ The core has **no runtime dependencies** and uses only `globalThis.crypto` and t
 
 ---
 
+## ⚠️ Limitations (v0.1.0)
+
+Read these before relying on it in production — they're scope boundaries of the
+first release, not bugs, and each is addressed by a roadmap item:
+
+- **The built-in `memoryStorage()` is per-process.** On serverless / edge platforms
+  (Vercel, Cloudflare Workers, AWS Lambda) every instance keeps its own counters, so
+  rate limits and budgets are enforced **per instance, not globally**. For shared
+  enforcement across instances, provide a distributed `Storage` adapter (e.g. Redis —
+  see [`examples/redis-adapter.md`](examples/redis-adapter.md)). Memory state is also
+  reset on process restart.
+- **Rate limiting is approximate under high concurrency.** A limit is checked and then
+  consumed across `await` points, so many simultaneous in-flight requests in the same
+  process can slightly overshoot the configured limit. It is exact for sequential or
+  modestly concurrent workloads; if you need hard atomic guarantees, back the guard
+  with a store that enforces atomicity.
+- **Streaming responses aren't auto-metered.** Token usage is parsed from non-streaming
+  JSON bodies. For streamed responses, pass an `estimate` (and/or `extractUsage`) so
+  budgets and cost tracking still apply.
+- **Cost is estimated** from a dated, overridable pricing snapshot — see the disclaimer
+  below.
+
+---
+
 ## ⚠️ Pricing disclaimer
 
 Cost figures are **estimates** based on a static, overridable pricing snapshot

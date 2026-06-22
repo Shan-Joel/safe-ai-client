@@ -3,7 +3,7 @@
 ## Reporting a vulnerability
 
 Please report security issues privately by opening a
-[GitHub security advisory](https://github.com/OWNER/safe-ai-client/security/advisories/new)
+[GitHub security advisory](https://github.com/Shan-Joel/safe-ai-client/security/advisories/new)
 or emailing the maintainers. Do not open public issues for vulnerabilities.
 We aim to acknowledge reports within 72 hours.
 
